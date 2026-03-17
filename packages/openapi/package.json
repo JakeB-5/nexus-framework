@@ -1,0 +1,30 @@
+{
+  "name": "@nexus/openapi",
+  "version": "0.1.0",
+  "description": "OpenAPI specification auto-generation",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@nexus/core": "workspace:*",
+    "@nexus/http": "workspace:*",
+    "@nexus/router": "workspace:*",
+    "@nexus/validator": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "vitest run --no-cache",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo",
+    "dev": "tsc --watch"
+  }
+}

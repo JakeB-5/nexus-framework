@@ -1,0 +1,29 @@
+{
+  "name": "@nexus/http",
+  "version": "0.1.0",
+  "description": "High-performance HTTP server with middleware pipeline",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@nexus/core": "workspace:*",
+    "@nexus/logger": "workspace:*",
+    "@nexus/config": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "vitest run --no-cache",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo",
+    "dev": "tsc --watch"
+  }
+}

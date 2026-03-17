@@ -1,0 +1,28 @@
+{
+  "name": "@nexus/mailer",
+  "version": "0.1.0",
+  "description": "Email sending with template support",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@nexus/core": "workspace:*",
+    "@nexus/config": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "vitest run --no-cache",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo",
+    "dev": "tsc --watch"
+  }
+}
