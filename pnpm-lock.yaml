@@ -209,7 +209,11 @@ importers:
         specifier: workspace:*
         version: link:../http
 
-  packages/validator: {}
+  packages/validator:
+    dependencies:
+      '@nexus/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/ws:
     dependencies:

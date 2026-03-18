@@ -158,6 +158,7 @@ describe("HTTP Error Classes", () => {
       message: "test",
       statusCode: 400,
       code: "BAD",
+      context: {},
     });
   });
 

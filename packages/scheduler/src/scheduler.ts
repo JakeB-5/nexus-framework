@@ -140,6 +140,8 @@ export class Scheduler {
     return this.jobs.size;
   }
 
+  private static readonly MAX_TIMEOUT = 2_147_483_647; // ~24.8 days, max for setTimeout
+
   private scheduleNext(job: ScheduledJob): void {
     if (!this.running) return;
     if (job.state === "disabled" || job.state === "paused") return;
@@ -151,20 +153,30 @@ export class Scheduler {
 
       this.clearJobTimer(job.name);
 
-      const timer = setTimeout(async () => {
-        if (!this.running) return;
+      let timer: ReturnType<typeof setTimeout>;
 
-        await job.execute();
-
-        // Schedule next execution if still running and job not disabled
-        if (
-          this.running &&
-          job.state !== "disabled" &&
-          job.state !== "paused"
-        ) {
+      if (delay > Scheduler.MAX_TIMEOUT) {
+        // Delay exceeds setTimeout's 32-bit limit; schedule an intermediate wakeup
+        timer = setTimeout(() => {
+          if (!this.running) return;
           this.scheduleNext(job);
-        }
-      }, delay);
+        }, Scheduler.MAX_TIMEOUT);
+      } else {
+        timer = setTimeout(async () => {
+          if (!this.running) return;
+
+          await job.execute();
+
+          // Schedule next execution if still running and job not disabled
+          if (
+            this.running &&
+            job.state !== "disabled" &&
+            job.state !== "paused"
+          ) {
+            this.scheduleNext(job);
+          }
+        }, delay);
+      }
 
       if (timer.unref) {
         timer.unref();

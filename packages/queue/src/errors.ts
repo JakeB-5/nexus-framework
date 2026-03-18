@@ -1,10 +1,10 @@
 // Queue error classes
 
-export class QueueError extends Error {
-  public readonly code: string = "QUEUE_ERROR";
+import { NexusError } from "@nexus/core";
 
+export class QueueError extends NexusError {
   constructor(message: string) {
-    super(message);
+    super(message, { code: "QUEUE_ERROR" });
     this.name = "QueueError";
   }
 }

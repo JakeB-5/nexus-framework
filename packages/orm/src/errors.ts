@@ -1,20 +1,17 @@
 // @nexus/orm - Error types
 
+import { NexusError } from "@nexus/core";
+
 /**
  * Base ORM error
  */
-export class OrmError extends Error {
-  public readonly code: string;
-  public readonly context: Record<string, unknown>;
-
+export class OrmError extends NexusError {
   constructor(
     message: string,
     options: { code?: string; cause?: Error; context?: Record<string, unknown> } = {},
   ) {
-    super(message);
+    super(message, { code: options.code ?? "ORM_ERROR", context: options.context, cause: options.cause });
     this.name = "OrmError";
-    this.code = options.code ?? "ORM_ERROR";
-    this.context = options.context ?? {};
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

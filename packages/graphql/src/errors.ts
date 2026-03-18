@@ -1,11 +1,12 @@
 // @nexus/graphql - GraphQL error types
 
+import { NexusError } from "@nexus/core";
 import type { GraphQLFormattedError } from "./types.js";
 
 /**
  * Base GraphQL error with location tracking and path info
  */
-export class GraphQLError extends Error {
+export class GraphQLError extends NexusError {
   public readonly locations: Array<{ line: number; column: number }>;
   public readonly path: Array<string | number>;
   public readonly extensions: Record<string, unknown>;
@@ -20,7 +21,7 @@ export class GraphQLError extends Error {
       originalError?: Error;
     } = {},
   ) {
-    super(message);
+    super(message, { code: (options.extensions?.code as string) ?? "GRAPHQL_ERROR" });
     this.name = "GraphQLError";
     this.locations = options.locations ?? [];
     this.path = options.path ?? [];
@@ -97,13 +98,10 @@ export class GraphQLExecutionError extends GraphQLError {
 /**
  * Error for schema building issues
  */
-export class SchemaError extends Error {
-  public readonly code: string;
-
+export class SchemaError extends NexusError {
   constructor(message: string, code?: string) {
-    super(message);
+    super(message, { code: code ?? "SCHEMA_ERROR" });
     this.name = "SchemaError";
-    this.code = code ?? "SCHEMA_ERROR";
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

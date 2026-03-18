@@ -10,8 +10,7 @@ import {
   isPing,
   isPong,
 } from "../src/protocol.js";
-import { Room } from "../src/room.js";
-import { RoomManager } from "../src/room-manager.js";
+import { Room, RoomManager } from "../src/room.js";
 import { WsClient } from "../src/ws-client.js";
 import { WebSocketServer } from "../src/ws-server.js";
 import { WsModule, WS_SERVER_TOKEN } from "../src/ws-module.js";
@@ -235,137 +234,13 @@ describe("Room", () => {
   });
 });
 
-// ─── RoomManager (room-manager.ts) ─────────────────────────────────────────
+// ─── RoomManager (room.ts) ──────────────────────────────────────────────────
 
-describe("RoomManager (room-manager.ts)", () => {
-  let manager: RoomManager;
+describe("RoomManager", () => {
+  let rm: RoomManager;
 
   beforeEach(() => {
-    manager = new RoomManager();
-  });
-
-  it("should create a room", () => {
-    manager.createRoom("lobby");
-    expect(manager.hasRoom("lobby")).toBe(true);
-    expect(manager.getRoomCount()).toBe(1);
-  });
-
-  it("should not duplicate rooms on repeated createRoom", () => {
-    manager.createRoom("lobby");
-    manager.createRoom("lobby");
-    expect(manager.getRoomCount()).toBe(1);
-  });
-
-  it("should join a client to a room, creating the room if needed", () => {
-    expect(manager.join("game", "c1")).toBe(true);
-    expect(manager.hasRoom("game")).toBe(true);
-    expect(manager.isInRoom("game", "c1")).toBe(true);
-  });
-
-  it("should respect maxClients when set via createRoom", () => {
-    manager.createRoom("small", { maxClients: 1 });
-    expect(manager.join("small", "c1")).toBe(true);
-    expect(manager.join("small", "c2")).toBe(false);
-  });
-
-  it("should leave a room and clean up empty rooms", () => {
-    manager.join("temp", "c1");
-    manager.leave("temp", "c1");
-    expect(manager.hasRoom("temp")).toBe(false);
-  });
-
-  it("should handle leaving a non-existent room gracefully", () => {
-    manager.leave("ghost", "c1"); // should not throw
-    expect(manager.hasRoom("ghost")).toBe(false);
-  });
-
-  it("should leave all rooms for a client", () => {
-    manager.join("r1", "c1");
-    manager.join("r2", "c1");
-    manager.join("r2", "c2");
-    manager.leaveAll("c1");
-    expect(manager.hasRoom("r1")).toBe(false);
-    expect(manager.hasRoom("r2")).toBe(true);
-    expect(manager.isInRoom("r2", "c1")).toBe(false);
-  });
-
-  it("should get clients in a room", () => {
-    manager.join("room", "c1");
-    manager.join("room", "c2");
-    const clients = manager.getClients("room");
-    expect(clients.has("c1")).toBe(true);
-    expect(clients.has("c2")).toBe(true);
-  });
-
-  it("should return empty set for non-existent room clients", () => {
-    const clients = manager.getClients("nope");
-    expect(clients.size).toBe(0);
-  });
-
-  it("should get rooms for a client", () => {
-    manager.join("a", "c1");
-    manager.join("b", "c1");
-    const rooms = manager.getClientRooms("c1");
-    expect(rooms).toContain("a");
-    expect(rooms).toContain("b");
-  });
-
-  it("should get room info", () => {
-    manager.join("info", "c1");
-    const info = manager.getRoomInfo("info");
-    expect(info).toBeDefined();
-    expect(info!.name).toBe("info");
-    expect(info!.size).toBe(1);
-  });
-
-  it("should return undefined for non-existent room info", () => {
-    expect(manager.getRoomInfo("nope")).toBeUndefined();
-  });
-
-  it("should list room names", () => {
-    manager.join("x", "c1");
-    manager.join("y", "c1");
-    const names = manager.getRoomNames();
-    expect(names).toContain("x");
-    expect(names).toContain("y");
-  });
-
-  it("should delete a room and return its clients", () => {
-    manager.join("del", "c1");
-    manager.join("del", "c2");
-    const clients = manager.deleteRoom("del");
-    expect(clients.size).toBe(2);
-    expect(clients.has("c1")).toBe(true);
-    expect(manager.hasRoom("del")).toBe(false);
-  });
-
-  it("should return empty set when deleting non-existent room", () => {
-    const clients = manager.deleteRoom("nope");
-    expect(clients.size).toBe(0);
-  });
-
-  it("should clear all rooms", () => {
-    manager.join("a", "c1");
-    manager.join("b", "c2");
-    manager.clear();
-    expect(manager.getRoomCount()).toBe(0);
-  });
-});
-
-// ─── Room (room.ts - as used in ws-server via RoomManager) ─────────────────
-
-describe("Room (from room.ts) - RoomManager class", () => {
-  // The room.ts file exports both Room and a RoomManager.
-  // The ws-server uses the RoomManager from room.ts. We test that here.
-  // We import { Room, RoomManager } from room.ts via the index.
-  // The Room class is already tested above. The RoomManager from room.ts
-  // has a different API (create, join with clientId first, broadcast, etc.)
-
-  let rm: InstanceType<typeof import("../src/room.js").RoomManager>;
-
-  beforeEach(async () => {
-    const mod = await import("../src/room.js");
-    rm = new mod.RoomManager();
+    rm = new RoomManager();
   });
 
   it("should create and get rooms", () => {
@@ -381,15 +256,27 @@ describe("Room (from room.ts) - RoomManager class", () => {
     expect(r1).toBe(r2);
   });
 
-  it("should join a client to a room", () => {
-    expect(rm.join("c1", "room1")).toBe(true);
-    expect(rm.has("room1")).toBe(true);
+  it("should not duplicate rooms on repeated create", () => {
+    rm.create("lobby");
+    rm.create("lobby");
+    expect(rm.size).toBe(1);
+  });
+
+  it("should join a client to a room, creating the room if needed", () => {
+    expect(rm.join("c1", "game")).toBe(true);
+    expect(rm.has("game")).toBe(true);
+  });
+
+  it("should respect maxClients", () => {
+    rm.create("small", { maxClients: 1 });
+    expect(rm.join("c1", "small")).toBe(true);
+    expect(rm.join("c2", "small")).toBe(false);
   });
 
   it("should leave a room and clean up empty rooms", () => {
-    rm.join("c1", "room1");
-    expect(rm.leave("c1", "room1")).toBe(true);
-    expect(rm.has("room1")).toBe(false);
+    rm.join("c1", "temp");
+    expect(rm.leave("c1", "temp")).toBe(true);
+    expect(rm.has("temp")).toBe(false);
   });
 
   it("should return false when leaving a non-existent room", () => {
@@ -449,6 +336,17 @@ describe("Room (from room.ts) - RoomManager class", () => {
     const list = rm.list();
     expect(list.length).toBe(2);
     expect(list.map((r) => r.name)).toContain("a");
+  });
+
+  it("should delete a room", () => {
+    rm.join("c1", "del");
+    rm.join("c2", "del");
+    expect(rm.delete("del")).toBe(true);
+    expect(rm.has("del")).toBe(false);
+  });
+
+  it("should return false when deleting non-existent room", () => {
+    expect(rm.delete("nope")).toBe(false);
   });
 
   it("should track size and clear", () => {
@@ -860,7 +758,7 @@ describe("Error classes", () => {
   it("WebSocketError should use defaults", () => {
     const err = new WebSocketError("msg");
     expect(err.code).toBe("WS_ERROR");
-    expect(err.context).toBeUndefined();
+    expect(err.context).toEqual({});
   });
 
   it("ConnectionError should have correct defaults", () => {

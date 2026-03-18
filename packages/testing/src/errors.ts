@@ -1,22 +1,21 @@
 // @nexus/testing - Error types
 
-export class TestSetupError extends Error {
-  public readonly code: string;
+import { NexusError } from "@nexus/core";
 
+export class TestSetupError extends NexusError {
   constructor(message: string, code?: string) {
-    super(message);
+    super(message, { code: code ?? "TEST_SETUP_ERROR" });
     this.name = "TestSetupError";
-    this.code = code ?? "TEST_SETUP_ERROR";
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
-export class AssertionError extends Error {
+export class AssertionError extends NexusError {
   public readonly expected: unknown;
   public readonly actual: unknown;
 
   constructor(message: string, expected?: unknown, actual?: unknown) {
-    super(message);
+    super(message, { code: "ASSERTION_ERROR" });
     this.name = "AssertionError";
     this.expected = expected;
     this.actual = actual;

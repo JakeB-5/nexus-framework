@@ -1,12 +1,11 @@
 // @nexus/openapi - Error types
 
-export class OpenApiError extends Error {
-  public readonly code: string;
+import { NexusError } from "@nexus/core";
 
+export class OpenApiError extends NexusError {
   constructor(message: string, code?: string) {
-    super(message);
+    super(message, { code: code ?? "OPENAPI_ERROR" });
     this.name = "OpenApiError";
-    this.code = code ?? "OPENAPI_ERROR";
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

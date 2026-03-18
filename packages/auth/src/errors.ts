@@ -1,21 +1,21 @@
 // Auth error classes
 
-export class AuthenticationError extends Error {
-  public readonly code: string = "AUTHENTICATION_ERROR";
+import { NexusError } from "@nexus/core";
+
+export class AuthenticationError extends NexusError {
   public readonly statusCode: number = 401;
 
   constructor(message = "Authentication required") {
-    super(message);
+    super(message, { code: "AUTHENTICATION_ERROR" });
     this.name = "AuthenticationError";
   }
 }
 
-export class AuthorizationError extends Error {
-  public readonly code = "AUTHORIZATION_ERROR";
+export class AuthorizationError extends NexusError {
   public readonly statusCode = 403;
 
   constructor(message = "Insufficient permissions") {
-    super(message);
+    super(message, { code: "AUTHORIZATION_ERROR" });
     this.name = "AuthorizationError";
   }
 }

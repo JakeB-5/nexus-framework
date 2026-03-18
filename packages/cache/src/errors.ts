@@ -1,15 +1,14 @@
 // @nexus/cache - Error types
 
+import { NexusError } from "@nexus/core";
+
 /**
  * Base cache error
  */
-export class CacheError extends Error {
-  public readonly code: string;
-
+export class CacheError extends NexusError {
   constructor(message: string, options: { code?: string; cause?: Error } = {}) {
-    super(message);
+    super(message, { code: options.code ?? "CACHE_ERROR", cause: options.cause });
     this.name = "CacheError";
-    this.code = options.code ?? "CACHE_ERROR";
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

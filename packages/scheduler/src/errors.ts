@@ -1,10 +1,10 @@
 // Scheduler error classes
 
-export class SchedulerError extends Error {
-  public readonly code: string = "SCHEDULER_ERROR";
+import { NexusError } from "@nexus/core";
 
+export class SchedulerError extends NexusError {
   constructor(message: string) {
-    super(message);
+    super(message, { code: "SCHEDULER_ERROR" });
     this.name = "SchedulerError";
   }
 }

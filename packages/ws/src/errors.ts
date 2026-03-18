@@ -1,14 +1,11 @@
 // @nexus/ws - Error classes
 
-export class WebSocketError extends Error {
-  public readonly code: string;
-  public readonly context?: Record<string, unknown>;
+import { NexusError } from "@nexus/core";
 
+export class WebSocketError extends NexusError {
   constructor(message: string, code?: string, context?: Record<string, unknown>) {
-    super(message);
+    super(message, { code: code ?? "WS_ERROR", context });
     this.name = "WebSocketError";
-    this.code = code ?? "WS_ERROR";
-    this.context = context;
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

@@ -1,15 +1,14 @@
 // @nexus/storage - Error types
 
+import { NexusError } from "@nexus/core";
+
 /**
  * Base storage error
  */
-export class StorageError extends Error {
-  public readonly code: string;
-
+export class StorageError extends NexusError {
   constructor(message: string, options: { code?: string; cause?: Error } = {}) {
-    super(message);
+    super(message, { code: options.code ?? "STORAGE_ERROR", cause: options.cause });
     this.name = "StorageError";
-    this.code = options.code ?? "STORAGE_ERROR";
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

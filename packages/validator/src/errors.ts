@@ -1,5 +1,7 @@
 // @nexus/validator - Validation error types
 
+import { NexusError } from "@nexus/core";
+
 /**
  * Validation issue codes
  */
@@ -35,12 +37,12 @@ export interface ValidationIssue {
 /**
  * Validation error containing all issues
  */
-export class ValidationError extends Error {
+export class ValidationError extends NexusError {
   public readonly issues: ValidationIssue[];
 
   constructor(issues: ValidationIssue[]) {
     const message = ValidationError.formatIssues(issues);
-    super(message);
+    super(message, { code: "VALIDATION_ERROR" });
     this.name = "ValidationError";
     this.issues = issues;
     Object.setPrototypeOf(this, new.target.prototype);

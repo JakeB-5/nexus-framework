@@ -1,13 +1,14 @@
 // @nexus/router - Error classes
 
-export class RouteNotFoundError extends Error {
+import { NexusError } from "@nexus/core";
+
+export class RouteNotFoundError extends NexusError {
   public readonly statusCode = 404;
-  public readonly code = "ROUTE_NOT_FOUND";
   public readonly path: string;
   public readonly method: string;
 
   constructor(method: string, path: string) {
-    super(`Route not found: ${method} ${path}`);
+    super(`Route not found: ${method} ${path}`, { code: "ROUTE_NOT_FOUND" });
     this.name = "RouteNotFoundError";
     this.path = path;
     this.method = method;
@@ -15,15 +16,14 @@ export class RouteNotFoundError extends Error {
   }
 }
 
-export class MethodNotAllowedError extends Error {
+export class MethodNotAllowedError extends NexusError {
   public readonly statusCode = 405;
-  public readonly code = "METHOD_NOT_ALLOWED";
   public readonly path: string;
   public readonly method: string;
   public readonly allowedMethods: string[];
 
   constructor(method: string, path: string, allowedMethods: string[]) {
-    super(`Method ${method} not allowed for ${path}. Allowed: ${allowedMethods.join(", ")}`);
+    super(`Method ${method} not allowed for ${path}. Allowed: ${allowedMethods.join(", ")}`, { code: "METHOD_NOT_ALLOWED" });
     this.name = "MethodNotAllowedError";
     this.path = path;
     this.method = method;

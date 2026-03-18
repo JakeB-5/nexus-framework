@@ -1,10 +1,10 @@
 // Mailer error classes
 
-export class MailError extends Error {
-  public readonly code: string = "MAIL_ERROR";
+import { NexusError } from "@nexus/core";
 
+export class MailError extends NexusError {
   constructor(message: string) {
-    super(message);
+    super(message, { code: "MAIL_ERROR" });
     this.name = "MailError";
   }
 }

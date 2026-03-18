@@ -1,16 +1,16 @@
 // @nexus/security - Error types
 
+import { NexusError } from "@nexus/core";
+
 /**
  * Base security error
  */
-export class SecurityError extends Error {
-  public readonly code: string;
+export class SecurityError extends NexusError {
   public readonly statusCode: number;
 
   constructor(message: string, options: { code?: string; statusCode?: number; cause?: Error } = {}) {
-    super(message);
+    super(message, { code: options.code ?? "SECURITY_ERROR", cause: options.cause });
     this.name = "SecurityError";
-    this.code = options.code ?? "SECURITY_ERROR";
     this.statusCode = options.statusCode ?? 403;
     Object.setPrototypeOf(this, new.target.prototype);
   }

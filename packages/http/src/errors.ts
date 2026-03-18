@@ -1,16 +1,14 @@
 // @nexus/http - HTTP error classes
 
-export class HttpError extends Error {
+import { NexusError } from "@nexus/core";
+
+export class HttpError extends NexusError {
   public readonly statusCode: number;
-  public readonly code: string;
-  public readonly context?: Record<string, unknown>;
 
   constructor(message: string, statusCode: number, code?: string, context?: Record<string, unknown>) {
-    super(message);
+    super(message, { code: code ?? `HTTP_${statusCode}`, context });
     this.name = "HttpError";
     this.statusCode = statusCode;
-    this.code = code ?? `HTTP_${statusCode}`;
-    this.context = context;
     Object.setPrototypeOf(this, new.target.prototype);
   }
 
